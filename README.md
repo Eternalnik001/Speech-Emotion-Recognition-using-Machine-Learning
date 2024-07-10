@@ -117,7 +117,6 @@ rate of 0.5.
 X_train, X_test, y_train, y_test = train_test_split(
  X, Y, test_size=0.1, random_state=42
 )
-# print the details
 print("Number of training samples = ", X_train.shape[0])
 print ("Number of testing samples = ", X_test.shape[0])
 num_labels = Y.shape[1]
