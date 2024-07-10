@@ -11,34 +11,6 @@ we import the necessary libraries for our speech emotion detection system. The v
 library that supports audio and music analysis is Librosa. It provides building blocks that are 
 required to construct an information retrieval model from music. Another library we will use is for 
 deep learning modeling purposes is TensorFlow
-import IPython.display as ipd
-import librosa
-import librosa.display
-import pandas as pd
-import os, time, warnings
-import seaborn as sns
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from tensorflow.keras.models import load_model
-import pickle
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import (
- Dense,
- Conv1D,
- MaxPooling1D,
- BatchNormalization,
- Dropout, 
- Flatten,
- Conv2D,
- MaxPool2D,
-)
-from IPython.display import Audio
-from sklearn.metrics import confusion_matrix, classification_report
-
 
 7.3 Exploratory Data Analysis of Audio data
 We have different folders under the dataset folder. Before applying any preprocessing, we will try 
@@ -89,17 +61,7 @@ for each audio file, we have to use a loop over each row in the data frame. We a
 python library to track the progress. Inside the loop, we’ll prepare a customized file path for each 
 file and call the function to extract MFCC features and append features and corresponding labels 
 in a newly formed data frame.
-def features_extractor(file):
- audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast') 
- mfccs_features = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=40)
- mfccs_scaled_features = np.mean(mfccs_features.T,axis=0)
- return mfccs_scaled_features
-extracted_features=[]
-for index_num,row in tqdm(Tess_df.iterrows()):
- file_name = os.path.join(os.path.abspath(base_dir),str(row["Path"]))
- final_class_labels=row["Emotions"]
- data=features_extractor(file_name)
- extracted_features.append([data,final_class_labels])
+
  
 7.6 Ann Model Creation
 Split the dataset into train and test. 80% train data and 20% test data.
@@ -114,45 +76,20 @@ rate of 0.5.
 rate of 0.5.
 • The third layer again has 100 neurons with activation as Relu and the drop out at a rate of 
 0.5.
-X_train, X_test, y_train, y_test = train_test_split(
- X, Y, test_size=0.1, random_state=42
-)
-print("Number of training samples = ", X_train.shape[0])
-print ("Number of testing samples = ", X_test.shape[0])
-num_labels = Y.shape[1]
-ANN_Model = Sequential()
-ANN_Model.add(Dense(1000, activation="relu", input_shape=(40,)))
-ANN_Model.add(Dense(750, activation="relu"))
-ANN_Model.add(Dense(500, activation="relu"))
-ANN_Model.add(Dense(250, activation="relu"))
-ANN_Model.add(Dense(100, activation="relu"))
-ANN_Model.add(Dense(50, activation="relu"))
-ANN_Model.add(Dense(num_labels, activation="softmax"))
-ANN_Model.summary()
 
 7.7 Compile the Model
 To compile the model we need to define loss function which is categorical cross-entropy, accuracy 
 metrics which is accuracy score, and an optimizer which is Adam.
-ANN_Model.compile(loss='categorical_crossentropy',metrics=['accuracy'],optimizer='adam')
+
 
 7.8 Train the Model
 We will train the model and save the model in HDF5 format. We will train a model for 100 epochs 
 and batch size as 32. We’ll use callback, which is a checkpoint to know how much time it took to 
 trail over data’
-num_epochs = 100
-num_batch_size = 32
-t0 = time.time()
-history = ANN_Model.fit(
- X_train,
- y_train,
- batch_size=num_batch_size,
- epochs=num_epochs,
- validation_data=(X_test, y_test),
-)
-ANN_Model.save("Model1.h5")
-print("ANN Model Saved")
 
-7.9 Check the Test Accuracy
+7.9 Testing with Actual and Predicted Test Lables
+
+7.10 Check the Test Accuracy
 Finally, we will use the evaluate() method to assess the trained model on the test set and determine 
 the model's correctness or Accuracy.
 
